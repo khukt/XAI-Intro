@@ -356,12 +356,12 @@ def feature_inputs(scenario: str, key_prefix: str = "") -> pd.DataFrame:
         meta = cfg["feature_info"][feat]
         with cols[i % 3]:
             values[feat] = st.slider(
-                key=f"{key_prefix}-{feat}",
-                meta["label"],
-                float(meta["min"]),
-                float(meta["max"]),
-                float((meta["min"] + meta["max"]) / 2),
+                label=meta["label"],
+                min_value=float(meta["min"]),
+                max_value=float(meta["max"]),
+                value=float((meta["min"] + meta["max"]) / 2),
                 step=float(meta["step"]),
+                key=f"{key_prefix}-{feat}",
             )
     return pd.DataFrame([values])
 
