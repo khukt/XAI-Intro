@@ -519,7 +519,9 @@ def main():
     # ========== Tab 2: Explanations ==========
     with tab2:
         st.markdown("### 2) Explanations (Global • Local • Targeted)")
-        x_row = st.session_state.get("x_row", feature_inputs(scenario, key_prefix=f"tab2-{scenario}-{model_choice}-{st.session_state['session_uid']}"))
+        x_row = st.session_state.get("x_row")
+        if x_row is None:
+            x_row = feature_inputs(scenario, key_prefix=f"tab2-{scenario}-{model_choice}-{st.session_state['session_uid']}")
         prob = st.session_state.get("prob", predict_proba(bundle, x_row))
 
         st.subheader("Global Explanation — which factors usually matter?")
@@ -556,7 +558,9 @@ def main():
     # ========== Tab 3: Stakeholder Views ==========
     with tab3:
         st.markdown("### 3) Stakeholder Views — role-aware explanations")
-        x_row = st.session_state.get("x_row", feature_inputs(scenario, key_prefix=f"tab2-{scenario}-{model_choice}-{st.session_state['session_uid']}"))
+        x_row = st.session_state.get("x_row")
+        if x_row is None:
+            x_row = feature_inputs(scenario, key_prefix=f"tab2-{scenario}-{model_choice}-{st.session_state['session_uid']}")
         prob = st.session_state.get("prob", predict_proba(bundle, x_row))
         contribs = local_contributions(bundle, x_row, X_bg)
         stakeholder_panel(stakeholder, prob, contribs, bundle, x_row, X_bg, SCENARIOS[scenario]['positive_label'], SCENARIOS[scenario]['negative_label'])
@@ -569,7 +573,9 @@ def main():
     # ========== Tab 5: Summary & Export ==========
     with tab5:
         st.markdown("### 5) Summary & Export")
-        x_row = st.session_state.get("x_row", feature_inputs(scenario, key_prefix=f"tab2-{scenario}-{model_choice}-{st.session_state['session_uid']}"))
+        x_row = st.session_state.get("x_row")
+        if x_row is None:
+            x_row = feature_inputs(scenario, key_prefix=f"tab2-{scenario}-{model_choice}-{st.session_state['session_uid']}")
         prob = st.session_state.get("prob", predict_proba(bundle, x_row))
         label = SCENARIOS[scenario]['positive_label'] if prob >= 0.5 else SCENARIOS[scenario]['negative_label']
         contribs = local_contributions(bundle, x_row, X_bg)[:5]
