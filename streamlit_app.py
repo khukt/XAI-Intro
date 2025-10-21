@@ -348,7 +348,7 @@ def sidebar_controls() -> Tuple[str, str, str]:
     )
     return scenario, model_choice, stakeholder
 
-def feature_inputs(scenario: str) -> pd.DataFrame:
+def feature_inputs(scenario: str, key_prefix: str = "") -> pd.DataFrame:
     cfg = SCENARIOS[scenario]
     cols = st.columns(3)
     values = {}
@@ -356,6 +356,7 @@ def feature_inputs(scenario: str) -> pd.DataFrame:
         meta = cfg["feature_info"][feat]
         with cols[i % 3]:
             values[feat] = st.slider(
+                key=f"{key_prefix}-{feat}",
                 meta["label"],
                 float(meta["min"]),
                 float(meta["max"]),
@@ -500,7 +501,7 @@ def main():
     with tab1:
         st.markdown("### 1) Black Box Decision")
         st.write("Start with an opaque decision to highlight the need for explanations.")
-        x_row = feature_inputs(scenario)
+        x_row = feature_inputs(scenario, key_prefix="tab1")
         prob = predict_proba(bundle, x_row)
         decision_card(prob, SCENARIOS[scenario]['positive_label'], SCENARIOS[scenario]['negative_label'])
         transparency_note(bundle.is_white_box)
@@ -514,7 +515,7 @@ def main():
     # ========== Tab 2: Explanations ==========
     with tab2:
         st.markdown("### 2) Explanations (Global • Local • Targeted)")
-        x_row = st.session_state.get("x_row", feature_inputs(scenario))
+        x_row = st.session_state.get("x_row", feature_inputs(scenario, key_prefix="tab2"))
         prob = st.session_state.get("prob", predict_proba(bundle, x_row))
 
         st.subheader("Global Explanation — which factors usually matter?")
@@ -551,7 +552,7 @@ def main():
     # ========== Tab 3: Stakeholder Views ==========
     with tab3:
         st.markdown("### 3) Stakeholder Views — role-aware explanations")
-        x_row = st.session_state.get("x_row", feature_inputs(scenario))
+        x_row = st.session_state.get("x_row", feature_inputs(scenario, key_prefix="tab2"))
         prob = st.session_state.get("prob", predict_proba(bundle, x_row))
         contribs = local_contributions(bundle, x_row, X_bg)
         stakeholder_panel(stakeholder, prob, contribs, bundle, x_row, X_bg, SCENARIOS[scenario]['positive_label'], SCENARIOS[scenario]['negative_label'])
@@ -564,7 +565,7 @@ def main():
     # ========== Tab 5: Summary & Export ==========
     with tab5:
         st.markdown("### 5) Summary & Export")
-        x_row = st.session_state.get("x_row", feature_inputs(scenario))
+        x_row = st.session_state.get("x_row", feature_inputs(scenario, key_prefix="tab2"))
         prob = st.session_state.get("prob", predict_proba(bundle, x_row))
         label = SCENARIOS[scenario]['positive_label'] if prob >= 0.5 else SCENARIOS[scenario]['negative_label']
         contribs = local_contributions(bundle, x_row, X_bg)[:5]
